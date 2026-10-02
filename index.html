@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura Gourmet - System Restoran Modern</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .active-tab { background-color: #e11d48; color: white; }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans text-gray-800 min-h-screen flex flex-col">
+
+    <!-- Navbar Header -->
+    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-utensils text-rose-500 text-2xl"></i>
+                <div>
+                    <h1 class="text-lg font-bold tracking-wide">Aura Gourmet</h1>
+                    <p class="text-xs text-slate-400">Integrated Restaurant OS</p>
+                </div>
+            </div>
+            
+            <!-- Navigation Switcher -->
+            <nav class="flex space-x-1 bg-slate-800 p-1 rounded-lg text-xs font-semibold">
+                <button onclick="switchView('customer')" id="btn-customer" class="nav-btn px-3 py-2 rounded-md transition active-tab">
+                    <i class="fa-solid fa-mobile-screen mr-1"></i> Self-Order
+                </button>
+                <button onclick="switchView('pos')" id="btn-pos" class="nav-btn px-3 py-2 rounded-md transition hover:bg-slate-700">
+                    <i class="fa-solid fa-cash-register mr-1"></i> Kasir (POS)
+                </button>
+                <button onclick="switchView('kds')" id="btn-kds" class="nav-btn px-3 py-2 rounded-md transition hover:bg-slate-700">
+                    <i class="fa-solid fa-fire-burner mr-1"></i> Dapur (KDS)
+                </button>
+                <button onclick="switchView('admin')" id="btn-admin" class="nav-btn px-3 py-2 rounded-md transition hover:bg-slate-700">
+                    <i class="fa-solid fa-chart-line mr-1"></i> Laporan
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- App Container -->
+    <main class="max-w-7xl mx-auto p-4 md:p-6 flex-1 w-full">
+
+        <!-- ================= VIEW 1: SELF-ORDERING (CUSTOMER) ================= -->
+        <section id="view-customer" class="space-y-6">
+            <div class="bg-white p-4 rounded-xl shadow-sm border flex justify-between items-center">
+                <div>
+                    <h2 class="font-bold text-gray-800">Pemesanan Mandiri — Meja #04</h2>
+                    <p class="text-xs text-gray-500">Pilih menu, tambahkan catatan khusus, dan pesan langsung.</p>
+                </div>
+                <span class="bg-emerald-100 text-emerald-700 text-xs px-3 py-1 rounded-full font-medium">
+                    <i class="fa-solid fa-circle text-[8px] mr-1"></i> Online
+                </span>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="flex space-x-2 overflow-x-auto pb-2">
+                <button onclick="filterCategory('All')" class="cat-btn px-4 py-2 bg-rose-600 text-white rounded-full text-xs font-semibold whitespace-nowrap">Semua Menu</button>
+                <button onclick="filterCategory('Makanan Utama')" class="cat-btn px-4 py-2 bg-white text-gray-700 rounded-full text-xs font-semibold border hover:bg-gray-50 whitespace-nowrap">Makanan Utama</button>
+                <button onclick="filterCategory('Dessert')" class="cat-btn px-4 py-2 bg-white text-gray-700 rounded-full text-xs font-semibold border hover:bg-gray-50 whitespace-nowrap">Dessert</button>
+                <button onclick="filterCategory('Minuman')" class="cat-btn px-4 py-2 bg-white text-gray-700 rounded-full text-xs font-semibold border hover:bg-gray-50 whitespace-nowrap">Minuman</button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Product List Grid -->
+                <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4" id="menu-grid">
+                    <!-- Products rendered via JS -->
+                </div>
+
+                <!-- Shopping Cart Summary -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border h-fit space-y-4">
+                    <h3 class="font-bold text-base border-b pb-2 flex justify-between items-center">
+                        <span>Ringkasan Pesanan</span>
+                        <i class="fa-solid fa-shopping-bag text-rose-500"></i>
+                    </h3>
+                    <div id="cart-list" class="space-y-3 max-h-64 overflow-y-auto text-xs">
+                        <p class="text-gray-400 text-center py-6">Keranjang Anda masih kosong.</p>
+                    </div>
+                    <div class="border-t pt-3 space-y-1 text-xs">
+                        <div class="flex justify-between text-gray-600"><span>Subtotal:</span><span id="subtotal">Rp 0</span></div>
+                        <div class="flex justify-between text-gray-600"><span>Pajak Restoran (PB1 10%):</span><span id="tax">Rp 0</span></div>
+                        <div class="flex justify-between text-gray-600"><span>Service Charge (5%):</span><span id="service">Rp 0</span></div>
+                        <div class="flex justify-between font-bold text-sm border-t pt-2 mt-2 text-slate-900">
+                            <span>Total Tagihan:</span>
+                            <span id="grand-total" class="text-rose-600">Rp 0</span>
+                        </div>
+                    </div>
+                    <button onclick="processCheckout()" class="w-full bg-rose-600 text-white font-bold py-3 rounded-lg hover:bg-rose-700 transition text-xs shadow-md">
+                        Kirim Pesanan ke Dapur
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 2: KASIR (POS SYSTEM) ================= -->
+        <section id="view-pos" class="hidden space-y-6">
+            <div class="bg-white p-5 rounded-xl shadow-sm border space-y-4">
+                <h3 class="font-bold text-base">Manajemen Meja & Status Real-Time</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3" id="table-grid">
+                    <!-- Tables rendered via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 3: KITCHEN DISPLAY (KDS) ================= -->
+        <section id="view-kds" class="hidden space-y-6">
+            <div class="bg-slate-800 text-white p-4 rounded-xl flex justify-between items-center">
+                <h3 class="font-bold"><i class="fa-solid fa-fire-burner text-amber-500 mr-2"></i> Monitor Antrean Dapur</h3>
+                <span class="text-xs bg-slate-700 px-3 py-1 rounded-full">Auto-Sync Active</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="kds-grid">
+                <!-- Kitchen orders rendered via JS -->
+            </div>
+        </section>
+
+        <!-- ================= VIEW 4: ADMIN / REPORTING ================= -->
+        <section id="view-admin" class="hidden space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-xl border shadow-sm">
+                    <p class="text-xs text-gray-500 font-medium">Penjualan Hari Ini</p>
+                    <p class="text-2xl font-bold text-slate-800 mt-1">Rp 4.850.000</p>
+                    <p class="text-xs text-emerald-600 mt-1"><i class="fa-solid fa-arrow-up"></i> +14% vs kemarin</p>
+                </div>
+                <div class="bg-white p-5 rounded-xl border shadow-sm">
+                    <p class="text-xs text-gray-500 font-medium">Total Pesanan</p>
+                    <p class="text-2xl font-bold text-slate-800 mt-1">42 Transaksi</p>
+                </div>
+                <div class="bg-white p-5 rounded-xl border shadow-sm">
+                    <p class="text-xs text-gray-500 font-medium">Item Terlaris</p>
+                    <p class="text-lg font-bold text-rose-600 mt-1">Wagyu Sirloin Steak</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Frontend Script -->
+    <script>
+        let allProducts = [];
+        let cart = [];
+        let kitchenOrders = [
+            { id: 'ORD-101', table: 'Meja 01', time: '8 min lalu', items: ['1x Prime Wagyu Sirloin', '1x Caramel Salted Latte'], status: 'Cooking' },
+            { id: 'ORD-102', table: 'Meja 04', time: '2 min lalu', items: ['2x Nasi Goreng Wagyu', '2x Uji Matcha Oat Latte'], status: 'New' }
+        ];
+
+        // Inisialisasi Aplikasi
+        window.onload = function() {
+            if (typeof google !== 'undefined' && google.script) {
+                google.script.run.withSuccessHandler(initProducts).getProducts();
+                google.script.run.withSuccessHandler(initTables).getTableData();
+            } else {
+                // Fallback offline / local test data
+                initProducts([
+                    { id: 1, name: 'Prime Wagyu Sirloin Steak', price: 245000, category: 'Makanan Utama', icon: 'fa-drumstick-bite', description: '200g Wagyu grilled medium-rare.' },
+                    { id: 2, name: 'Nasi Goreng Wagyu Satay', price: 95000, category: 'Makanan Utama', icon: 'fa-bowl-rice', description: 'Nasi goreng rempah dan sate wagyu.' },
+                    { id: 3, name: 'Signature Caramel Salted Latte', price: 42000, category: 'Minuman', icon: 'fa-mug-hot', description: 'Espresso, susu, karamel, sea salt.' },
+                    { id: 4, name: 'Classic Molten Lava Cake', price: 55000, category: 'Dessert', icon: 'fa-cake-candles', description: 'Cokelat hangat meleleh & es krim.' }
+                ]);
+                initTables([
+                    { id: 'T01', name: 'Meja 01', status: 'Occupied', guests: 4 },
+                    { id: 'T02', name: 'Meja 02', status: 'Free', guests: 0 },
+                    { id: 'T03', name: 'Meja 03', status: 'Free', guests: 0 },
+                    { id: 'T04', name: 'Meja 04', status: 'Waiting', guests: 2 }
+                ]);
+            }
+            renderKDS();
+        };
+
+        function switchView(viewName) {
+            document.querySelectorAll('main > section').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active-tab'));
+            
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+            document.getElementById(`btn-${viewName}`).classList.add('active-tab');
+        }
+
+        function initProducts(data) {
+            allProducts = data;
+            renderMenu(allProducts);
+        }
+
+        function renderMenu(products) {
+            const grid = document.getElementById('menu-grid');
+            grid.innerHTML = products.map(p => `
+                <div class="bg-white p-4 rounded-xl border shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="w-full h-28 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400 text-3xl mb-3">
+                            <i class="fa-solid ${p.icon}"></i>
+                        </div>
+                        <span class="text-[10px] text-rose-600 font-bold uppercase tracking-wider">${p.category}</span>
+                        <h4 class="font-bold text-slate-800 text-sm mt-0.5">${p.name}</h4>
+                        <p class="text-xs text-gray-500 mt-1 line-clamp-2">${p.description}</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t flex justify-between items-center">
+                        <span class="font-bold text-slate-900 text-xs">Rp ${p.price.toLocaleString('id-ID')}</span>
+                        <button onclick="addToCart(${p.id})" class="bg-slate-900 text-white text-xs px-3 py-1.5 rounded-lg font-medium hover:bg-rose-600 transition">
+                            + Tambah
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterCategory(cat) {
+            if (cat === 'All') {
+                renderMenu(allProducts);
+            } else {
+                renderMenu(allProducts.filter(p => p.category === cat));
+            }
+        }
+
+        function addToCart(pId) {
+            const item = allProducts.find(p => p.id === pId);
+            const exist = cart.find(c => c.id === pId);
+            if (exist) {
+                exist.qty++;
+            } else {
+                cart.push({ ...item, qty: 1 });
+            }
+            updateCart();
+        }
+
+        function updateCart() {
+            const container = document.getElementById('cart-list');
+            if (cart.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-center py-6">Keranjang Anda masih kosong.</p>';
+            } else {
+                container.innerHTML = cart.map(c => `
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <div>
+                            <p class="font-bold text-slate-800">${c.name}</p>
+                            <p class="text-gray-500">Rp ${c.price.toLocaleString('id-ID')} x ${c.qty}</p>
+                        </div>
+                        <span class="font-bold text-slate-900">Rp ${(c.price * c.qty).toLocaleString('id-ID')}</span>
+                    </div>
+                `).join('');
+            }
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const tax = subtotal * 0.10;
+            const service = subtotal * 0.05;
+            const total = subtotal + tax + service;
+
+            document.getElementById('subtotal').innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
+            document.getElementById('tax').innerText = `Rp ${tax.toLocaleString('id-ID')}`;
+            document.getElementById('service').innerText = `Rp ${service.toLocaleString('id-ID')}`;
+            document.getElementById('grand-total').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+        }
+
+        function processCheckout() {
+            if (cart.length === 0) return alert('Pilih minimal satu menu!');
+            
+            const newOrder = {
+                id: `ORD-${Math.floor(100 + Math.random() * 900)}`,
+                table: 'Meja 04',
+                time: 'Baru saja',
+                items: cart.map(c => `${c.qty}x ${c.name}`),
+                status: 'New'
+            };
+
+            kitchenOrders.push(newOrder);
+            cart = [];
+            updateCart();
+            renderKDS();
+            alert('Pesanan berhasil dikirim ke layar Dapur (KDS)!');
+        }
+
+        function initTables(tables) {
+            const grid = document.getElementById('table-grid');
+            grid.innerHTML = tables.map(t => {
+                let badgeClass = t.status === 'Free' ? 'bg-emerald-100 text-emerald-700' :
+                                 t.status === 'Occupied' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700';
+                return `
+                    <div class="p-3 rounded-xl border text-center space-y-1 bg-white">
+                        <span class="block font-bold text-xs text-slate-800">${t.name}</span>
+                        <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full ${badgeClass}">${t.status}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderKDS() {
+            const grid = document.getElementById('kds-grid');
+            grid.innerHTML = kitchenOrders.map(k => `
+                <div class="bg-white border-2 ${k.status === 'New' ? 'border-amber-400' : 'border-emerald-500'} rounded-xl p-4 shadow-sm space-y-3">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <span class="font-bold text-rose-600 text-sm">${k.table} (${k.id})</span>
+                        <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded font-medium">${k.time}</span>
+                    </div>
+                    <ul class="text-xs space-y-1 font-mono text-slate-700">
+                        ${k.items.map(i => `<li>• ${i}</li>`).join('')}
+                    </ul>
+                    <button onclick="finishKDSOrder('${k.id}')" class="w-full bg-slate-900 text-white text-xs py-2 rounded-lg font-medium hover:bg-emerald-600 transition">
+                        Selesai Dimasak
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function finishKDSOrder(id) {
+            kitchenOrders = kitchenOrders.filter(o => o.id !== id);
+            renderKDS();
+        }
+    </script>
+</body>
+</html>
